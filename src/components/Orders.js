@@ -30,7 +30,7 @@ function Orders() {
         >
           {"Loyalty Points have been added to your Account!"}
         </div> : undefined}
-    <div className="orders">
+    <div className="orders" id="2">
       {flag && <div><p className="greenery">Congratulations! You have contributed to the Environment.</p></div>}
       <h1>Your Orders</h1>
     {flag && <Confetti

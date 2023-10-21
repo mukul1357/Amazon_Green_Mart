@@ -15,7 +15,7 @@ function Checkout({ user, setUser }) {
   };
 
   return (
-    <div className="checkout">
+    <div className="checkout" id="5">
       <div className="checkout__left">
         <a
           href="http://www.amazon.in/"

@@ -79,8 +79,9 @@
 
 .header__nav {
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   align-items: center;
+  max-width: 32%;
 }
 
 .header__option {
@@ -273,4 +274,24 @@
   .header__optionTwo {
     font-size: 1.5em;
   }  
+}
+
+#coinIcon {
+  flex-direction: row;
+  max-width: 14%;
+}
+
+.points {
+  position: relative;
+top: 1.7px;
+right: 1px;
+}
+
+.header__option1 {
+  display: flex;
+  flex-direction: column;
+  
+  color: rgb(255, 255, 255);
+  padding: .25em 1em;
+  margin-inline: 0 .25em;
 }

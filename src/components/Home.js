@@ -32,7 +32,7 @@ function Home({ mediaWidth }) {
   }, [cart]);
 
   return (
-    <div className="home">
+    <div className="home" id="1">
       <div className="home__container">
         <img src={mediaWidth > 840 ? background : background2} alt="home-background" className="home__image" />
 

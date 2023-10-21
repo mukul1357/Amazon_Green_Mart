@@ -65,7 +65,7 @@ function Payment() {
   };
 
   return (
-    <div className="payment">
+    <div className="payment" id="3">
       <div className="payment__container">
         <h1>Checkout {<Link to="/checkout">{!cart.length ? 'empty' : `${cart.length} ${cart.length === 1 ? 'item' : 'items'}` }</Link>}</h1>
 

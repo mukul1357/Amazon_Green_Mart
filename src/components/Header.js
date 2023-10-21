@@ -10,6 +10,9 @@ import { CgClose } from "react-icons/cg";
 import { TbMenu2 } from "react-icons/tb";
 import { useSelector } from "react-redux";
 import { auth } from "../config/firebase";
+import Dropdownmenu from "./Dropdownmenu";
+import { stringify } from "@firebase/util";
+import coinIcon from '../images/coinIcon.png';
 
 function Header({ mediaWidth }) {
   const cart = useSelector((state) => state.cart);
@@ -18,6 +21,33 @@ function Header({ mediaWidth }) {
   const navigate = useNavigate();
 
   const [mobileNav, setMobileNav] = useState(false);
+  // const [isDropdownVisible, setDropdownVisible] = useState(false);
+
+  // const handleMouseEnter = () => {
+  //   for(var i=1;i<7;i++) {
+  //     try {
+  //     let ele = document.getElementById(i.toString()).style;
+  //     ele.filter = 'blur(2px)';
+  //     }
+  //     catch {
+  //       ;
+  //     }
+  //   }
+  //   setDropdownVisible(true);
+  // };
+
+  // const handleMouseLeave = () => {
+  //   for(var i=1;i<7;i++) {
+  //     try {
+  //     let ele = document.getElementById(i.toString()).style;
+  //     ele.filter = '';
+  //     }
+  //     catch {
+  //       ;
+  //     }
+  //   }
+  //   setDropdownVisible(false);
+  // };
 
   const handleAuthentication = () => {
     setMobileNav((prevState) => !prevState);
@@ -88,6 +118,17 @@ function Header({ mediaWidth }) {
             </Link>
           )}
 
+          {/* {mediaWidth > 840 && (
+            <div
+            className="header__option"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <span className="loyalty">Loyalty Points</span>
+            {isDropdownVisible && <Dropdownmenu />}
+            </div>
+          )} */}
+
           {mediaWidth <= 840 && (
             <div className="header__mobileUser" onClick={() => !user && navigate('/login')}>
               <MdPersonOutline className="header__mobileUserIcon" />
@@ -110,6 +151,12 @@ function Header({ mediaWidth }) {
               {mediaWidth > 840 && <span>Cart</span>}
             </div>
           </Link>
+          {mediaWidth > 840 && user && (
+              <div className="header__option1" id="coinIcon">
+                <img src={coinIcon} alt=""/>
+                {mediaWidth > 840 && <span className="points" style={{fontWeight: "bold"}}>1200</span>}
+              </div>
+            )}
         </nav>
       </div>
       <div className="header__mobileContainer">
