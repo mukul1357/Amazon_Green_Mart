@@ -1,0 +1,16 @@
+.text-sm {
+    font-size: 0.78rem;
+line-height: 1.0rem;
+}
+
+.nextButton {
+    position: relative;
+    float: right;
+    left: 0.5rem;
+    top: 2rem;
+    background-color: rgb(254,189,104);
+}
+
+.ulBox {
+    align-self: flex-start;
+}
