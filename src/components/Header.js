@@ -20,7 +20,6 @@ function Header({ mediaWidth }) {
   const user = JSON.parse(localStorage.getItem("1"));
   var greenPoints = JSON.parse(localStorage.getItem("greenPoints"));
   const navigate = useNavigate();
-  // console.log("Hello");
 
   const [mobileNav, setMobileNav] = useState(false);
 
@@ -180,13 +179,30 @@ function Header({ mediaWidth }) {
           </Link>
           {mediaWidth > 840 && user && (
             <div className="header__option1" id="coinIcon">
+              <div className="flex" style={{flexDirection: "column", position: "relative", top: "0.2rem"}}>
               <img src={coinIcon} alt="" style={{ width: "2.3rem" }} />
+              <span className="header__optionTwo" style={{marginLeft: "0.4rem", fontSize: "x-small"}}>CGP</span>
+              </div>
               {mediaWidth > 840 && (
                 <span className="points" style={{ fontWeight: "bold" }}>
                   {parseInt(greenPoints)}
                 </span>
               )}
             </div>
+
+            // <div className="header__optionBasket">
+            //   <div>
+            //     <div className="header__optionBasketCount">{parseInt(greenPoints)}</div>
+            //     <img
+            //       src={coinIcon}
+            //       alt="CGP"
+            //       className="header__basket"
+            //     />
+            //   </div>
+            //   {mediaWidth > 840 && (
+            //     <span className="header__optionTwo">CGP</span>
+            //   )}
+            // </div>
           )}
         </nav>
       </div>

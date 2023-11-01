@@ -1,7 +1,8 @@
 import React from "react";
+import "../styles/Data.css";
 
 export default function Data(props) {
-    const handleSubmit = () => {
+    async function handleSubmit() {
         var d1 = document.getElementById("d1").value;
         var d2 = document.getElementById("d2").value;
         var d3 = document.getElementById("d3").value;
@@ -12,17 +13,26 @@ export default function Data(props) {
         var d8 = document.getElementById("d8").value;
         var d9 = document.getElementById("d9").value;
         var d10 = document.getElementById("d10").value;
+
+        const month = document.getElementById("months").value;
         var data = [d1, d2, d3, d4, d5, d6, d7, d8, d9, d10];
-        console.log(data);
-        // fetch('http://localhost:5000/predict', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({
-        //         data: data
-        //     })
-        // }).then(response => response.json())
+        const demands = []
+        for(let i=0;i<10;i++) {
+            demands.push(parseInt(data[i]))
+        }
+        const result = await fetch('http://localhost:5001/demand', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                past_data: demands,
+                month: month
+            })
+        }).then(response => response.json())
+        .catch((error) => {
+              console.error('Error:', error);
+          });
         // .then(data => {
         //     console.log('Success:', data);
         //     alert("Prediction: " + data.prediction);
@@ -30,6 +40,8 @@ export default function Data(props) {
         // .catch((error) => {
         //     console.error('Error:', error);
         // });
+        demands.push(result['result']);
+        props.setDemand(demands);
         let ele = document.getElementById("mainContainer");
         ele.style.filter = "";
         props.setInput(false);
@@ -39,7 +51,22 @@ export default function Data(props) {
     <div class="absolute z-10 max-w-xl w-full bg-white rounded-lg shadow dark:bg-gray-800 p-4 md:p-6 mt-10" style={{marginLeft: "27.5rem", marginRight: "27.5rem", paddingLeft: "6.5rem"}}>
       <div class="flex justify-between items-start">
         <form>
-          <div class="grid gap-8 mb-6 md:grid-cols-2">
+          <div class="grid gap-8 mb-6 md:grid-cols-3">
+          <select id="months" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <option selected>Select a Month</option>
+                <option value="jan">January</option>
+                <option value="feb">February</option>
+                <option value="mar">March</option>
+                <option value="apr">April</option>
+                <option value="may">May</option>
+                <option value="jun">June</option>
+                <option value="jul">July</option>
+                <option value="aug">August</option>
+                <option value="sep">September</option>
+                <option value="oct">October</option>
+                <option value="nov">November</option>
+                <option value="dec">December</option>
+            </select>
             <div>
               <label
                 for="d1"

@@ -13,11 +13,17 @@ function Order({ order }) {
       {order.cart?.map((item, index) => (
         <CheckoutProduct
           id={item.id}
+          seller_id={item.seller_id}
           cartId={index}
           title={item.title}
           image={item.image}
           price={item.price}
           rating={item.rating}
+          green={item.green}
+          seller_name={item.seller_name}
+          isGS={item.isGS}
+          discount={item.discount}
+          slab={item.slab}
         />
       ))}
       <p className="order__total">

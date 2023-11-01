@@ -106,3 +106,9 @@ top: -119px;
   position: relative;
   top: -246px;
 }
+
+.offerBox {
+  position: relative;
+  top: -250px;
+  flex-direction: column;
+}

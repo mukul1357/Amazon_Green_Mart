@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import LineChartComponent from './LineChart'
 import Data from './Data';
+import LineChartComponent2 from './LineChart2';
 
 export default function Inventory() {
     const box = React.createRef();
@@ -17,7 +18,86 @@ export default function Inventory() {
     const [stdValue, setStdValue] = useState(new Date());
     const label_encode = { "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6, "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12 }
     const [input, setInput] = useState(false);
+    const [monthly, setMonthly] = useState([]);
+    const [dates, setDates] = useState([]);
+    const [demand, setDemand] = useState([150, 97, 45, 118, 87, 167, 125, 56, 90, 120]);
+    const months_data = [];
+    const date_data = [];
 
+    const handleMonthly = (data) => {
+      while(months_data.length > 0) {
+        months_data.pop();
+      }
+
+      for(let i=0;i<data['data'].length;i++) {
+        months_data.push(data['data'][i]);
+      }
+      setMonthly(months_data);
+    }
+
+    const handleDate = (data) => {
+      while(date_data.length > 0) {
+        date_data.pop();
+      }
+      for(let i=0;i<10;i++)
+        date_data.push(data['previous_data'][i]);
+      date_data.push(data['result']);
+      setDates(date_data);
+      // console.log(date_data);
+    }
+
+    const handleDemand = (data) => {
+      const arr = []
+      for(let i=0;i<10;i++)
+        arr.push(demand[i]);
+      arr.push(data['result']);
+      setDemand(arr);
+    }
+
+    useEffect(() => {
+      if(demand.length !== 11) {
+        const month = 'oct';
+        fetch('http://localhost:5001/demand', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                past_data: demand,
+                month: month
+            })
+        }).then(response => response.json()).then(data => handleDemand(data))
+        .catch((error) => {
+              console.error('Error:', error);
+          });
+      }
+    }, [demand])
+
+    useEffect(() => {
+      if(monthly.length === 0) {
+        fetch('http://localhost:5001/monthly').then(response => response.json()).then(data => handleMonthly(data))
+      }
+    }, [monthly])
+
+    // fetch('http://localhost:5001/monthly').then(response => response.json()).then(data => handleMonthly(data))
+    // fetch('http://localhost:5001/date').then(response => response.json()).then(data => handleDate(data));
+    useEffect(() => {
+      if(dates.length === 0) {
+        fetch('http://localhost:5001/date', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                date: stdValue
+            })
+        }).then(response => response.json()).then(data => handleDate(data))
+        .catch((error) => {
+              console.error('Error:', error);
+          });
+      }
+    }, [dates]);
+  
     const dataInputHandle = () => {
         setInput(!input);
         if(!input) {
@@ -36,6 +116,20 @@ export default function Inventory() {
         setValue(label_encode[arr[1]]+"/"+arr[2]+"/"+arr[3]);
         setStdValue(newValue["$d"]);
         openCalendar();
+        const stdval = newValue["$d"];
+
+        fetch('http://localhost:5001/date', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                date: stdval
+            })
+        }).then(response => response.json()).then(data => handleDate(data))
+        .catch((error) => {
+              console.error('Error:', error);
+          });
     }
     
     const openCalendar = () => {
@@ -112,7 +206,7 @@ export default function Inventory() {
 
   return (
     <>
-    {input && <Data setInput={setInput}/>}
+    {input && <Data setInput={setInput} setDemand={setDemand}/>}
     <div className='flex flex-col' id='mainContainer'>
         
 <div className='flex justify-evenly' style={{height: "35rem"}}>
@@ -188,7 +282,7 @@ export default function Inventory() {
   </div>
   </div>
 
-  <LineChartComponent />
+  {dates.length !== 0 ? <LineChartComponent2 data={dates} /> : undefined}
 </div>
 
 
@@ -254,7 +348,7 @@ export default function Inventory() {
   </div>
   </div>
 
-  <LineChartComponent />    
+  {demand.length === 11 ? <LineChartComponent2 data={demand} /> : undefined}
 </div>
 
 
@@ -332,7 +426,7 @@ export default function Inventory() {
     </div>
   </div>
   </div>
-  <LineChartComponent/>
+  {monthly.length !== 0 ? <LineChartComponent data={monthly}/> : undefined}
   </div>
   
 </div>

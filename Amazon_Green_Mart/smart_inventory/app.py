@@ -5,9 +5,11 @@ from datetime import datetime
 from dateutil import parser
 import pandas as pd
 import numpy as np
+from flask_cors import CORS
 
 app = Flask(__name__)
 api = Api(app)
+cors = CORS(app)
 
 demand_parser = reqparse.RequestParser()
 demand_parser.add_argument('past_data', type=int, required=True, action='append')
@@ -21,6 +23,7 @@ months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 
 class DemandPrediction(Resource):
     def post(self):
         args = demand_parser.parse_args() 
+        # print(args)
         past_data = args['past_data']
         month = args['month']
         input = parse_data(past_data, month)
@@ -31,6 +34,8 @@ class GetDateDemand(Resource):
     def post(self):
         args = demand_date_parser.parse_args()
         date = parser.parse(args['date'])
+        # print("Date:    ")
+        # print(date)
         month = date.month
         day = date.day
         index = (month - 1) * 31 + day - 11

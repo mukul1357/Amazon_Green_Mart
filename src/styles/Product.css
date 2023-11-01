@@ -46,6 +46,12 @@
   font-size: smaller;
 }
 
+.sellerIcon {
+  max-width: 2rem;
+    position: relative;
+    bottom: 0.2rem;
+}
+
 .product__price > :nth-child(even) {
   margin-top: -0.2em;
   font-size: 2em;
@@ -68,6 +74,13 @@ top: 0.4rem; */
 -moz-box-pack: justify;
 justify-content: space-between;
 /* height: 2.3rem; */
+}
+
+.gsIcon {
+  max-width: 3.2rem;
+  align-self: flex-start;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .contain1 {

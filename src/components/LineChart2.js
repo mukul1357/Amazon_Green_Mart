@@ -2,79 +2,76 @@ import React from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 
-const LineChartComponent = (props) => {
-  // console.log("hello", props.data);
+const LineChartComponent2 = (props) => {
+  // console.log(props.data)
     const data = [
         {
-          name: 'Jan',
+          name: 'Day1',
           demand: props.data[0],
           
         },
         {
-          name: 'Feb',
+          name: 'Day2',
           
           demand: props.data[1],
           
         },
         {
-          name: 'Mar',
+          name: 'Day3',
           
           demand: props.data[2],
           
         },
         {
-          name: 'Apr',
+          name: 'Day4',
           
           demand: props.data[3],
           
         },
         {
-          name: 'May',
+          name: 'Day5',
           
           demand: props.data[4],
           
         },
         {
-          name: 'June',
+          name: 'Day6',
           
           demand: props.data[5],
           
         },
         {
-          name: 'July',
+          name: 'Day7',
           
           demand: props.data[6],
          
         },
         {
-          name: 'Aug',
+          name: 'Day8',
           
           demand: props.data[7],
           
         },
         {
-          name: 'Sep',
+          name: 'Day9',
           
           demand: props.data[8],
           
         },
         {
-          name: 'Oct',
+          name: 'Day10',
           
           demand: props.data[9],
           
         },
         {
-          name: 'Nov',
-          
-          demand: props.data[10],
-          
-        },
-        {
-          name: 'Dec',
-          
-          demand: props.data[11],
-        }
+            name: 'Next Day',
+            
+            demand: props.data[10],
+            
+          },
+
+
       ];
     return (
         <ResponsiveContainer width="90%" height="80%">
@@ -94,11 +91,11 @@ const LineChartComponent = (props) => {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey="demand" stroke="#8884d8" />
+            <Line type="monotone" dataKey="demand" stroke="#8884d8" activeDot={{ r: 11 }} />
             {/* <Line type="monotone" dataKey="uv" stroke="#82ca9d" /> */}
           </LineChart>
         </ResponsiveContainer>
       );
 }
 
-export default LineChartComponent;
+export default LineChartComponent2;

@@ -38,8 +38,11 @@ function App() {
   const [ID, setID] = useState(1);
   const [prodAdded, setProdAdded] = useState(false);
   const [prediction, setPrediction] = useState(0);
-  // console.log("Hello World");
-  // setMediaWidth(window.innerWidth);
+  const [seller_id, setSellerID] = useState(1);
+  const [greenScheme, setGreenScheme] = useState(false);
+  const [seller_name, setSellerName] = useState(null);
+  const [discount, setDiscount] = useState(0);
+  const [slab, setSlab] = useState(0);
   window.addEventListener("resize", (event) =>
     setMediaWidth(window.innerWidth)
   );
@@ -47,7 +50,27 @@ function App() {
 
   const points = JSON.parse(localStorage.getItem("greenPoints"));
   if(points === null)
-    localStorage.setItem("greenPoints", JSON.stringify(1200));
+    localStorage.setItem("greenPoints", JSON.stringify(0));
+
+  const addGS = (array, id, name) => {
+    var add = {
+      seller_id: id,
+      seller_name: name,
+      amount: 0,
+      vgp: 0
+    }
+    array.push(add);
+    return array;
+  }
+
+  const greenSchemeActive = JSON.parse(localStorage.getItem("greenScheme"));
+  var array = []
+  if(greenSchemeActive === null) {
+    array = addGS(array, "10", "Apple");
+    array = addGS(array, "12", "Amazon");
+    array = addGS(array, "14", "Allied Stores");
+    localStorage.setItem("greenScheme", JSON.stringify(array));
+  }
 
   // useEffect(() => {
   //   auth.onAuthStateChanged((authUser) => {
@@ -70,7 +93,7 @@ function App() {
             element={
               <>
                 {/* <Header mediaWidth={mediaWidth} user={user} setUser={setUser}/> */}
-                <Home prediction={prediction} mediaWidth={mediaWidth} user={user} setUser={setUser} category={category} name={name} price={price} image={image} ID={ID} prodAdded={prodAdded} setProdAdded={setProdAdded}/>
+                <Home slab={slab} discount={discount} seller_name={seller_name} seller_id={seller_id} greenScheme={greenScheme} prediction={prediction} mediaWidth={mediaWidth} user={user} setUser={setUser} category={category} name={name} price={price} image={image} ID={ID} prodAdded={prodAdded} setProdAdded={setProdAdded}/>
               </>
             }
           />
@@ -79,7 +102,7 @@ function App() {
             element={
               <>
                 {/* <Header mediaWidth={mediaWidth} user={user} setUser={setUser}/> */}
-                <Orders  user={user} setUser={setUser}/>
+                <Orders user={user} setUser={setUser}/>
               </>
             }
           />
@@ -110,20 +133,20 @@ function App() {
             element={
               <>
                 {/* <Header mediaWidth={mediaWidth} user={user} setUser={setUser}/> */}
-                <Sell setID={setID} category={category} setCategory={setCategory} subcategory={subcategory} setSubCategory={setSubCategory} name={name} setName={setName}/>
+                <Sell setSellerName={setSellerName} setSellerID={setSellerID} setID={setID} category={category} setCategory={setCategory} subcategory={subcategory} setSubCategory={setSubCategory} name={name} setName={setName}/>
               </>
             }
           />
           <Route path="/sellCloth" element={
           <>
           {/* <Header mediaWidth={mediaWidth} user={user} setUser={setUser}/> */}
-          <Sell2 setPrediction={setPrediction} setProdAdded={setProdAdded} category={category} setCategory={setCategory} subcategory={subcategory} setSubCategory={setSubCategory} name={name} setName={setName} price={price} setPrice={setPrice} image={image} setImage={setImage}/>
+          <Sell2 setSlab={setSlab} setDiscount={setDiscount} seller_id={seller_id} seller_name={seller_name} setGreenScheme={setGreenScheme} setPrediction={setPrediction} setProdAdded={setProdAdded} category={category} setCategory={setCategory} subcategory={subcategory} setSubCategory={setSubCategory} name={name} setName={setName} price={price} setPrice={setPrice} image={image} setImage={setImage}/>
           </>}
           />
           <Route path="/sellAppliance" element={
           <>
           {/* <Header mediaWidth={mediaWidth} user={user} setUser={setUser}/> */}
-          <Sell3 setPrediction={setPrediction} setProdAdded={setProdAdded} category={category} setCategory={setCategory} subcategory={subcategory} setSubCategory={setSubCategory} name={name} setName={setName} price={price} setPrice={setPrice} image={image} setImage={setImage}/>
+          <Sell3 setSlab={setSlab} setDiscount={setDiscount} seller_id={seller_id} seller_name={seller_name} setGreenScheme={setGreenScheme} setPrediction={setPrediction} setProdAdded={setProdAdded} category={category} setCategory={setCategory} subcategory={subcategory} setSubCategory={setSubCategory} name={name} setName={setName} price={price} setPrice={setPrice} image={image} setImage={setImage}/>
           </>}
           />
           <Route path="/inventoryManagement" element={

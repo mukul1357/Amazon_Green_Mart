@@ -25,9 +25,40 @@ function Payment() {
   const original_price = utils.getTotalPrice(cart);
   var total = utils.getTotalPrice(cart);
   var points = parseInt(JSON.parse(localStorage.getItem("greenPoints")));
-  // const [checkBox, setCheck] = useState(false);
+  const [checker, setChecker] = useState(false);
   var checkBox = false;
   var coins_left = points;
+  const loyalty_points = [];
+  const final_points = [];
+
+  const arr = [];
+  cart?.map((item, index) => {
+    var item1 = {
+      id: item.id,
+      seller_id: item.seller_id,
+      price: item.price,
+      green: item.green,
+      isGS: item.isGS,
+      discount: item.discount,
+      slab: item.slab
+    }
+    arr.push(item1);
+  });
+  const vgp_get = (arr[0].slab)*0.8;    // Max vgp that will get
+  const cgp_get = (arr[0].slab)*0.2;    // Max cgp that will get
+
+  const discount_available = [0, 0]
+
+  const greenScheme = JSON.parse(localStorage.getItem("greenScheme"));
+  greenScheme.forEach((item) => {
+    if(parseInt(item.seller_id) === parseInt(arr[0].seller_id)) {
+      discount_available[0] = parseFloat(item.vgp);
+    }
+  })
+  discount_available[1] = parseInt(JSON.parse(localStorage.getItem("greenPoints")));
+
+  const final_vgp = discount_available[0] - Math.min(discount_available[0], arr[0].discount) + vgp_get;
+  const final_cgp = discount_available[1] - Math.min(discount_available[1], 0.7*(arr[0].discount)) + cgp_get;
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -50,19 +81,70 @@ function Payment() {
       setProcessing("")
       setSucceeded(true)
       setDisabled(true)
-      dispatch(emptyCart());
-      var arr = [];
+      var arr1 = [];
       var items = JSON.parse(localStorage.getItem("amazon_1"));
       order.amount = utils.formatter.format(total);
-      arr.push(order);
+      arr1.push(order);
       if (items) {
         for (let i = 0; i < items.length; i++)
-          arr.push(items[i]);
+          arr1.push(items[i]);
       }
+
+      cart.forEach((item) => {
+        if(item.green > 3 && item.isGS) {
+          loyalty_points[0] = vgp_get;
+          loyalty_points[1] = cgp_get;
+        }
+      });
+      // console.log("points: ", loyalty_points);
       // console.log(arr);
-      localStorage.setItem("amazon_1", JSON.stringify(arr));
+      localStorage.setItem("amazon_1", JSON.stringify(arr1));
       localStorage.setItem("orderPlacedActive", JSON.stringify(true));
-      localStorage.setItem("greenPoints", JSON.stringify(coins_left))
+      const greenScheme = JSON.parse(localStorage.getItem("greenScheme"));
+      if(checker) {
+        if(final_points[0] === "VGP") {
+          greenScheme.forEach((item) => {
+            if(parseInt(item.seller_id) === parseInt(arr[0].seller_id)) {
+              item.vgp = final_vgp;
+            }
+          })
+          localStorage.setItem("greenScheme", JSON.stringify(greenScheme));
+          localStorage.setItem("greenPoints", JSON.stringify(discount_available[1] + cgp_get));
+        }
+        else if(final_points[0] === "CGP") {
+          localStorage.setItem("greenPoints", JSON.stringify(final_cgp));
+          greenScheme.forEach((item) => {
+            if(parseInt(item.seller_id) === parseInt(arr[0].seller_id)) {
+              item.vgp += vgp_get;
+            }
+          })
+          localStorage.setItem("greenScheme", JSON.stringify(greenScheme));
+        }
+        else {
+          localStorage.setItem("greenPoints", JSON.stringify(discount_available[1] + cgp_get));
+          greenScheme.forEach((item) => {
+            if(parseInt(item.seller_id) === parseInt(arr[0].seller_id)) {
+              item.vgp += vgp_get;
+            }
+          })
+          localStorage.setItem("greenScheme", JSON.stringify(greenScheme));
+        }
+      }
+      else {
+        localStorage.setItem("greenPoints", JSON.stringify(discount_available[1] + cgp_get));
+          greenScheme.forEach((item) => {
+            if(parseInt(item.seller_id) === parseInt(arr[0].seller_id)) {
+              item.vgp += vgp_get;
+              console.log(item.vgp);
+              console.log(greenScheme[0].vgp, greenScheme[0].seller_name)
+            }
+          })
+          console.log(greenScheme);
+        localStorage.setItem("greenScheme", JSON.stringify(greenScheme));
+      }
+      localStorage.setItem("loyaltyPoints", JSON.stringify(loyalty_points))   //Represents VGP and CGP added
+      
+      dispatch(emptyCart());
       navigate('/orders', { replace: true });
     }, 1000);
   };
@@ -72,33 +154,33 @@ function Payment() {
     setError(event.error ? event.error.message : "");
   };
 
-  const onCheckBoxClick = () => {
-    total = original_price;
-    if (!checkBox) {
-      checkBox = true;
-      var per = total / 5;   // 20% of total price
-      var points_to_rs = Math.floor(points / 5);
-      if (total < 2000) {
-        per = Math.min(per, 500);
-        total -= Math.min(per, points_to_rs);
-      }
-      else if (total >= 2000 && total < 40000) {
-        per = Math.min(per, 800);
-        total -= Math.min(per, points_to_rs);
-      }
-      else {
-        per = Math.min(per, 5000);
-        total -= Math.min(per, points_to_rs);
-      }
-      coins_left = points - 5*Math.min(per, points_to_rs);
+  const handleChange1 = (e) => {
+    const val = e.target.value;
+    if (val === "VGP") {
+      total = original_price - Math.min(discount_available[0], arr[0].discount);
+      final_points.push("VGP")
+    }
+    else if(val === "CGP") {
+      total = original_price - Math.min(discount_available[1], 0.7*(arr[0].discount));
+      final_points.push("CGP")
     }
     else {
-      checkBox = false;
-      coins_left = points;
+      total = original_price;
     }
-    // console.log(total);
     let ele = document.getElementById("priceContain");
     ele.innerText = "Rs." + utils.formatter.format(total);
+  };
+
+  const onCheckBoxClick = (e) => {
+    total = original_price;
+    if (!checker) {
+      setChecker(true);
+    }
+    else {
+      // checkBox = false;
+      setChecker(false);
+      coins_left = points;
+    }
   }
 
   const onMouseEnter = (e) => {
@@ -111,9 +193,6 @@ function Payment() {
     let ele = document.getElementById("popover-description");
     let ele1 = document.getElementById("box");
     var eleBounds = box.current.getBoundingClientRect();
-    // console.log("e.clientX = ", e.clientX);
-    // console.log("eleBounds Left = ", eleBounds.left-20);
-    // console.log("eleBounds right = ", eleBounds.right);
     if (e.clientX >= eleBounds.left - 20 && e.clientX <= eleBounds.right) {
       ele.className = "visible inline-block text-sm transition-opacity duration-300 border rounded-lg shadow-sm opacity-100 w-72 bg-gray-800 border-gray-600 text-gray-400 popover"
     } else {
@@ -142,14 +221,29 @@ function Payment() {
             <h3>Review Items and Delivery</h3>
           </div>
           <div className="payment__items">
-            {cart?.map((item, index) => (
+            {cart?.map((item, index) =>
+              // var item1 = {
+              //   id: item.id,
+              //   seller_id: item.seller_id,
+              //   price: item.price,
+              //   green: item.green,
+              //   isGS: item.isGS
+              // }
+              // arr.push(item1);
+              (
               <CheckoutProduct
                 id={item.id}
+                seller_id={item.seller_id}
                 cartId={index}
                 title={item.title}
                 image={item.image}
                 price={item.price}
                 rating={item.rating}
+                green={item.green}
+                seller_name={item.seller_name}
+                isGS={item.isGS}
+                discount={item.discount}
+                slab={item.slab}
               />
             ))}
           </div>
@@ -168,24 +262,26 @@ function Payment() {
               <div class="flex mb-4" style={{ flexDirection: "column" }}>
                 <p>Cash on Delivery</p>
                 <div style={{ display: "flex", height: "258px" }}>
-                  <input id="default-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 checkbox" onClick={onCheckBoxClick} />
-                  {/* <label for="default-checkbox" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Default checkbox</label> */}
-                  {/* </div> */}
-
+                  <input id="checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 checkbox" onClick={(e) => {onCheckBoxClick(e)}} />
                   <p class="flex items-center text-sm text-blue-600 titlePara" style={{ marginLeft: "5px" }}>Use Green Points <button data-popover-target="popover-description" data-popover-placement="bottom-end" type="button" onMouseEnter={e => onMouseEnter(e)} onMouseLeave={e => onMouseLeave(e)} className="buttonInfo"><svg class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg><span class="sr-only">Show information</span></button>
 
                     <div data-popover id="popover-description" role="tooltip" class="invisible inline-block text-sm transition-opacity duration-300 border rounded-lg shadow-sm opacity-0 w-72 bg-gray-800 border-gray-600 text-gray-400 popover">
                       <div class="p-3 space-y-2" style={{ marginLeft: "7px" }}>
                         <div id="box" ref={box}>
-                          <h3 class="font-semibold text-white title">Discount via using Green Points</h3></div>
+                          <h3 class="font-semibold text-white title">Rewards after purchase</h3></div>
                         <ul>
-                          <li className="li_payment"><h5>20% off upto Rs.500 for price less than Rs.2000</h5></li>
-                          <li className="li_payment"><h5>20% off upto Rs.800 for price greater than or equal to Rs.2000 and less than Rs.40,000</h5></li>
-                          <li className="li_payment"><h4>20% off upto Rs.5000 for price greater than or equal to Rs.40,000</h4></li>
+                          <li className="li_payment"><h5>Vendor Green Points: {vgp_get}</h5></li>
+                          <li className="li_payment"><h5>Common Green Points: {cgp_get}</h5></li>
                         </ul>
-        
+
+                        <h3 class="font-semibold text-white title">Discount for the current product</h3>
+                        <ul>
+                          <li className="li_payment"><h5>Vendor Green Points: {Math.min(discount_available[0], arr[0].discount)}</h5></li>
+                          <li className="li_payment"><h5>Common Green Points: {Math.min(discount_available[1], 0.7*(arr[0].discount))}</h5></li>
+                        </ul>
+
                         <div class="font-medium"><p className="font-medium text-white underline">Note: </p><div>
-                          <h6>1 Rs = 5 coins, and discount will be application according to the number of Green Points you have.</h6>
+                          <h6>1 Rs = 1 point, and discount will be application according to the number of Green Points you have.</h6>
                         </div>
                         </div>
                       </div>
@@ -193,6 +289,25 @@ function Payment() {
                     </div></p>
 
                 </div>
+
+                {checker ? (<div className="flex mb-1 text-sm mt-5 offerBox" style={{maxWidth: "9.6rem"}}>
+        <label
+          for="offers"
+          class="mb-2 text-sm font-medium text-gray-900 dark:text-white"
+        >
+          Offers
+        </label>
+      <select
+        id="offers"
+        onChange={(e) => handleChange1(e)}
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+      >
+        <option selected>Select an Offer</option>
+        {discount_available[0] > 0 ? <option value="VGP">Vendor Green Points</option> : undefined}
+        {discount_available[1] > 0 ? <option value="CGP">Common Green Points</option> : undefined}
+      </select>
+      </div>) : undefined}
+
               </div>
 
               {/* <CardElement onChange={handleChange} /> */}

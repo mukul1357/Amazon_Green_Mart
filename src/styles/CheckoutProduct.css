@@ -96,3 +96,10 @@
     margin-left: auto;
   }
 }
+
+.greenContainer {
+  display: flex;
+-moz-box-pack: justify;
+justify-content: space-between;
+/* height: 2.3rem; */
+}

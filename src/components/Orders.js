@@ -10,7 +10,10 @@ function Orders() {
   const [orders, setOrders] = useState([]);
   const [alert, setAlert] = useState(true);
   const user = JSON.parse(localStorage.getItem("1"));
-  const flag = JSON.parse(localStorage.getItem("orderPlacedActive"));  
+  const flag = JSON.parse(localStorage.getItem("orderPlacedActive"));
+  const loyalty_points = JSON.parse(localStorage.getItem("loyaltyPoints"));
+  // console.log(loyalty_points)
+  // localStorage.setItem("loyaltyPoints", JSON.stringify(0));
 
   var extStoreOrders =
     JSON.parse(localStorage.getItem(`amazon_${user.uid}`)) || [];
@@ -28,10 +31,10 @@ function Orders() {
               : "home__alert"
           }
         >
-          {"Loyalty Points have been added to your Account!"}
+          {`${loyalty_points[0]} VGP and ${loyalty_points[1]} CGP have been added to your Account!`}
         </div> : undefined}
     <div className="orders" id="2">
-      {flag && <div><p className="greenery">Congratulations! You have contributed to the Environment.</p></div>}
+      {flag && <div><p className="greenery">Thank You for your contribution to the Environment.</p></div>}
       <h1>Your Orders</h1>
     {flag && <Confetti
     width={window.innerWidth}
